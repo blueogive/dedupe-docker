@@ -8,11 +8,7 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - dedupe
-  - pandas_dedupe
   - pytest
-  - sphinx
-  - coverage
   - flake8
   - python-dotenv
   - sqlalchemy

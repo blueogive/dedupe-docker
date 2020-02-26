@@ -5,7 +5,7 @@
 # CONDA_ENV_FILE := conda-env.yml
 CONDA_ENV_FILE := conda-env-no-version.yml
 PIP_REQ_FILE := pip-req.txt
-VCS_URL := $(shell git remote get-url --push gl)
+VCS_URL := $(shell git remote get-url --push gh)
 VCS_REF := $(shell git rev-parse --short HEAD)
 BUILD_DATE := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 TAG_DATE := $(shell date -u +"%Y%m%d")
@@ -21,7 +21,7 @@ docker-check :
 	@echo Computing reclaimable space consumed by Docker artifacts
 	docker system df
 
-docker-build: Dockerfile conda-env*.yml pip-req.txt pip.conf fix-permissions
+az-build: Dockerfile conda-env*.yml pip-req.txt pip.conf fix-permissions
 	@az acr build \
 	--registry ${AZ_ACR_NAME} \
 	--build-arg CONDA_ENV_FILE=$(CONDA_ENV_FILE) \
@@ -32,6 +32,16 @@ docker-build: Dockerfile conda-env*.yml pip-req.txt pip.conf fix-permissions
 	-t dedupe-docker:$(TAG_DATE) \
 	-t dedupe-docker:latest .
 
+docker-build: Dockerfile conda-env*.yml pip-req.txt pip.conf fix-permissions
+	@docker build \
+	--build-arg CONDA_ENV_FILE=$(CONDA_ENV_FILE) \
+	--build-arg PIP_REQ_FILE=$(PIP_REQ_FILE) \
+	--build-arg VCS_URL=$(VCS_URL) \
+	--build-arg VCS_REF=$(VCS_REF) \
+	--build-arg BUILD_DATE=$(BUILD_DATE) \
+	--tag blueogive/dedupe-docker:$(TAG_DATE) \
+	--tag blueogive/dedupe-docker:latest .
+
 docker-push : docker-build
-	@docker push dedupe-docker:$(TAG_DATE)
-	@docker push dedupe-docker:latest
+	@docker push blueogive/dedupe-docker:$(TAG_DATE)
+	@docker push blueogive/dedupe-docker:latest
