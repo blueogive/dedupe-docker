@@ -40,19 +40,19 @@ RUN apt-get update --fix-missing \
         pandoc \
         pandoc-citeproc \
         # Linux system packages that are dependencies of R packages
-        libxml2-dev \
-        libcurl4-gnutls-dev \
-        liblapack-dev \
-        libgdal-dev \
-        libgeos-dev \
-        libproj-dev \
-        libcairo2-dev \
-        libssl1.0-dev \
+        # libxml2-dev \
+        # libcurl4-gnutls-dev \
+        # liblapack-dev \
+        # libgdal-dev \
+        # libgeos-dev \
+        # libproj-dev \
+        # libcairo2-dev \
+        # libssl1.0-dev \
         unzip \
         # Allow R pkgs requiring X11 to install/run using virtual framebuffer
-        xvfb \
-        xauth \
-        xfonts-base \
+        # xvfb \
+        # xauth \
+        # xfonts-base \
         # MRO dependencies that don't sort themselves out on their own:
         less \
         libgomp1 \
@@ -88,6 +88,8 @@ ENV LC_ALL="en_US.UTF-8" \
     CT_FMODE=0775 \
     CONDA_DIR=/opt/conda
 
+ENV HOME=/home/${CT_USER}
+
 RUN wget --quiet \
     https://repo.anaconda.com/miniconda/Miniconda3-4.7.12.1-Linux-x86_64.sh \
     -O /root/miniconda.sh && \
@@ -104,10 +106,10 @@ ADD fix-permissions /usr/local/bin/fix-permissions
 ## User should also have & own a home directory (e.g. for linked volumes to work properly).
 RUN useradd --create-home --uid ${CT_UID} --gid ${CT_GID} --shell ${SHELL} ${CT_USER}
 
-WORKDIR ${HOME}
+# RUN fix-permissions ${CONDA_DIR} \
+#     && fix-permissions ${HOME}
 
-RUN fix-permissions ${CONDA_DIR} \
-    && fix-permissions /home/${CT_USER}
+WORKDIR ${HOME}
 
 USER ${CT_USER}
 
@@ -119,11 +121,11 @@ RUN /opt/conda/bin/conda update -n base -c defaults conda \
     && /opt/conda/bin/conda env update -n base --file ${CONDA_ENV_FILE} \
     && /opt/conda/bin/conda install conda-build \
     && /opt/conda/bin/conda build purge-all \
-    && rm ${CONDA_ENV_FILE} \
-    && fix-permissions ${CONDA_DIR} \
-    && fix-permissions /home/${CT_USER}
+    && rm ${CONDA_ENV_FILE}
+    # && fix-permissions ${HOME}
+    # && fix-permissions ${CONDA_DIR}
 
-USER ${CT_USER}
+# USER ${CT_USER}
 
 RUN echo ". /opt/conda/etc/profile.d/conda.sh" >> ${HOME}/.bashrc && \
     echo "conda activate base" >> ${HOME}/.bashrc && \

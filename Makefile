@@ -29,8 +29,8 @@ docker-build: Dockerfile conda-env*.yml pip-req.txt pip.conf fix-permissions
 	--build-arg VCS_URL=$(VCS_URL) \
 	--build-arg VCS_REF=$(VCS_REF) \
 	--build-arg BUILD_DATE=$(BUILD_DATE) \
-	--t dedupe-docker:$(TAG_DATE) \
-	--t dedupe-docker:latest .
+	-t dedupe-docker:$(TAG_DATE) \
+	-t dedupe-docker:latest .
 
 docker-push : docker-build
 	@docker push dedupe-docker:$(TAG_DATE)
