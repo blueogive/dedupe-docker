@@ -1,2 +1,4 @@
 dedupe
 pandas_dedupe
+jellyfish
+lxml
